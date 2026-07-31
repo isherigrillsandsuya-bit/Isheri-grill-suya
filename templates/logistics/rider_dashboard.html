@@ -1,0 +1,48 @@
+{% extends 'base/base.html' %}
+{% block content %}
+<div class="mt-4 pb-10">
+    <div class="bg-stone-800 border border-stone-700 rounded-3xl p-5 flex items-center justify-between shadow-xl mb-6">
+        <div>
+            <h1 class="text-xl font-black text-white tracking-tight">RIDER <span class="text-amber-500">PORTAL</span> 🛵</h1>
+            <p class="text-xs text-stone-400 mt-0.5">Active Deliveries</p>
+        </div>
+        <div class="w-10 h-10 bg-stone-900 rounded-full flex items-center justify-center border border-stone-700 shadow-inner">
+            <span class="text-xl">👤</span>
+        </div>
+    </div>
+
+    <div class="space-y-4">
+        {% for order in orders %}
+        <div class="bg-stone-800 border-l-4 border-amber-500 rounded-2xl p-4 shadow-lg">
+            <div class="flex justify-between items-start mb-2">
+                <span class="text-xs font-bold text-amber-500 bg-amber-500/10 px-2 py-1 rounded">{{ order.status|upper }}</span>
+                <span class="text-xs text-stone-400 font-mono">{{ order.order_number }}</span>
+            </div>
+            
+            <h3 class="font-bold text-stone-100 text-sm mb-1">Dropoff: {{ order.delivery_address|default:"Location Pending" }}</h3>
+            <p class="text-xs text-stone-400 mb-4">Customer Tel: <a href="tel:{{ order.user.phone_number }}" class="text-amber-400 underline">{{ order.user.phone_number }}</a></p>
+            
+            <div class="flex gap-2">
+                <a href="https://maps.google.com/?q={{ order.delivery_address }}" target="_blank" class="w-1/2 bg-stone-700 hover:bg-stone-600 text-stone-200 text-center text-xs font-bold py-3 rounded-xl transition">
+                    📍 Navigate
+                </a>
+                
+                <form method="POST" action="{% url 'logistics:verify_safe' order.id %}" class="w-1/2 flex flex-col gap-2">
+                    {% csrf_token %}
+                    <input type="text" name="delivery_pin" placeholder="Enter 4-Digit PIN" required maxlength="4" class="w-full bg-stone-900 border border-stone-600 rounded-lg px-2 py-2 text-center text-xs text-stone-100 uppercase font-mono">
+                    <button type="submit" class="w-full bg-green-600 hover:bg-green-500 text-white text-[10px] uppercase tracking-wider font-bold py-2 rounded-lg shadow-lg transition">
+                        Verify & Deliver
+                    </button>
+                </form>
+
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-center py-12 text-stone-500">
+            <span class="text-4xl mb-3 block">🛵</span>
+            <p>No active deliveries right now!</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock content %}

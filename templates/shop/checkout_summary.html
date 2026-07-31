@@ -1,0 +1,30 @@
+{% extends 'base/base.html' %}
+{% block content %}
+<div class="mt-4 bg-stone-800 border border-stone-700 rounded-3xl p-6 shadow-2xl">
+    <h1 class="text-2xl font-black text-white mb-1">Order Summary 🧾</h1>
+    <p class="text-xs text-stone-400 mb-6">Review your final math before payment.</p>
+    
+    <div class="p-4 bg-stone-900 rounded-xl border border-stone-700 mb-6 space-y-2">
+        <p class="text-xs text-stone-400">Delivering to:</p>
+        <p class="text-sm font-bold text-stone-100">{{ address }}</p>
+        {% if distance > 0 %}
+            <p class="text-xs text-amber-500 mt-1">📍 Distance from Isheri: {{ distance }} km</p>
+        {% endif %}
+    </div>
+    
+    <div class="space-y-3 text-sm text-stone-300 px-2 mb-6 border-b border-stone-700 pb-4">
+        <div class="flex justify-between"><span>Food Subtotal:</span><span class="font-bold">₦{{ subtotal|floatformat:2 }}</span></div>
+        <div class="flex justify-between text-red-400"><span>Platform Charge:</span><span>+ ₦{{ platform_charge|floatformat:2 }}</span></div>
+        <div class="flex justify-between text-amber-500"><span>Delivery Fee:</span><span>+ ₦{{ delivery_fee|floatformat:2 }}</span></div>
+    </div>
+
+    <div class="flex justify-between text-xl text-white font-black px-2 mb-8">
+        <span>Total Payable:</span>
+        <span>₦{{ total|floatformat:2 }}</span>
+    </div>
+    
+    <a href="{% url 'shop:initialize_payment' %}" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-4 rounded-xl shadow-lg transition uppercase tracking-wider flex items-center justify-center gap-2">
+        <span>🔒 Pay ₦{{ total|floatformat:2 }}</span>
+    </a>
+</div>
+{% endblock content %}

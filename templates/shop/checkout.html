@@ -1,0 +1,60 @@
+{% extends 'base/base.html' %}
+{% block content %}
+<div class="space-y-6 pb-6">
+    <div class="bg-stone-800 border border-stone-700 rounded-3xl p-5 shadow-xl flex justify-between items-center">
+        <h1 class="text-xl font-black text-white uppercase tracking-wide">Checkout</h1>
+        <a href="{% url 'shop:menu' %}" class="text-xs text-amber-500 font-bold">&larr; Back to Menu</a>
+    </div>
+
+    {% if messages %}
+    <div class="space-y-2">
+        {% for message in messages %}
+        <div class="p-3 rounded-xl text-xs font-bold bg-red-500/20 text-red-400 border border-red-500/30">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <form method="POST" action="{% url 'shop:checkout' %}" class="space-y-6">
+        {% csrf_token %}
+        
+        <div class="bg-stone-800 border border-stone-700 rounded-2xl p-4 space-y-2">
+            <label class="block text-xs font-bold uppercase tracking-wider text-stone-400">Delivery Address</label>
+            <textarea name="delivery_address" rows="2" required 
+                      class="w-full bg-stone-900 border border-stone-700 rounded-xl p-3 text-xs text-white placeholder-stone-500 focus:border-amber-500 focus:outline-none"
+                      placeholder="Enter full address in Lagos...">Isheri, Lagos</textarea>
+        </div>
+
+        <div class="bg-stone-800 border border-stone-700 rounded-2xl p-4 space-y-3">
+            <label class="block text-xs font-bold uppercase tracking-wider text-stone-400">Payment Method</label>
+            <div class="grid grid-cols-2 gap-3">
+                <label class="border border-stone-700 rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer hover:border-amber-500 bg-stone-900/50">
+                    <input type="radio" name="payment_method" value="paystack" checked class="accent-amber-500 mb-1">
+                    <span class="text-xs font-bold text-stone-200">💳 Online (Paystack)</span>
+                </label>
+                <label class="border border-stone-700 rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer hover:border-amber-500 bg-stone-900/50">
+                    <input type="radio" name="payment_method" value="wallet" class="accent-amber-500 mb-1">
+                    <span class="text-xs font-bold text-stone-200">👛 Wallet</span>
+                    <span class="text-[10px] text-amber-500 font-mono font-bold mt-0.5">(Bal: ₦{{ wallet.balance|floatformat:0 }})</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="bg-stone-800 border border-stone-700 rounded-2xl p-4 space-y-2">
+            <h2 class="text-xs font-bold uppercase tracking-wider text-stone-400 mb-2">Order Breakdown</h2>
+            <div class="flex justify-between text-xs text-stone-300"><span>Subtotal</span><span>₦{{ subtotal|floatformat:0 }}</span></div>
+            <div class="flex justify-between text-xs text-stone-300"><span>Platform Fee</span><span>₦{{ platform_charge|floatformat:0 }}</span></div>
+            <div class="flex justify-between text-xs text-stone-300"><span>Delivery Fee</span><span>₦{{ delivery_fee|floatformat:0 }}</span></div>
+            <div class="flex justify-between text-sm font-black text-white pt-2 border-t border-stone-700">
+                <span>Total Amount</span>
+                <span class="text-amber-500 text-base">₦{{ total|floatformat:0 }}</span>
+            </div>
+        </div>
+
+        <button type="submit" class="w-full bg-red-600 hover:bg-red-500 active:scale-95 text-white font-black py-4 rounded-2xl text-xs uppercase tracking-widest shadow-xl transition">
+            Confirm & Place Order 🔥
+        </button>
+    </form>
+</div>
+{% endblock content %}

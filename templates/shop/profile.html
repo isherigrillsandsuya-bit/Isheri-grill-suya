@@ -1,0 +1,26 @@
+{% extends 'base/base.html' %} 
+{% block content %} 
+<div class="space-y-6 pb-6"> 
+  <div class="bg-stone-800 border border-stone-700 rounded-3xl p-5 shadow-xl flex items-center gap-4"> 
+    <div class="w-14 h-14 bg-amber-500/20 text-amber-500 rounded-2xl flex items-center justify-center text-2xl font-black border border-amber-500/30"> 
+      {{ request.user.email|slice:":1"|upper }} 
+    </div> 
+    <div> 
+      <h1 class="text-lg font-black text-white uppercase tracking-wide">{{ request.user.get_full_name|default:request.user.email }}</h1> 
+      <p class="text-xs text-stone-400">{{ request.user.email }}</p> 
+    </div> 
+  </div> 
+
+  <div class="bg-gradient-to-br from-amber-600 via-amber-500 to-amber-700 rounded-3xl p-6 shadow-2xl text-stone-950 relative overflow-hidden"> 
+    <div class="absolute -right-6 -bottom-6 text-black/10 text-9xl font-black select-none pointer-events-none">₦</div> 
+    <p class="text-[10px] font-black uppercase tracking-widest text-stone-900/70 mb-1">Customer Wallet Balance</p> 
+    <h2 class="text-3xl font-black tracking-tight mb-4">₦{{ wallet.balance|floatformat:2 }}</h2> 
+
+    <form method="POST" action="{% url 'shop:topup_wallet' %}" class="flex gap-2"> 
+      {% csrf_token %} 
+      <input type="number" name="amount" placeholder="Amount" class="bg-black/20 text-white placeholder-stone-800 border border-stone-800 rounded-xl px-4 py-2 w-full focus:outline-none"> 
+      <button type="submit" class="bg-stone-950 text-white font-bold px-6 py-2 rounded-xl">Top up</button> 
+    </form> 
+  </div> 
+</div> 
+{% endblock %}

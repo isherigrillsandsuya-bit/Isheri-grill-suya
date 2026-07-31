@@ -1,0 +1,80 @@
+{% extends 'base/base.html' %}
+{% block content %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<div class="mt-4 bg-white border border-stone-200 rounded-3xl p-6 shadow-2xl text-stone-900 relative overflow-hidden">
+    <div class="absolute top-0 left-0 right-0 h-2 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCI+PHBvbHlnb24gcG9pbnRzPSIwLDAgNSwxMCAxMCwwIiBmaWxsPSIjRkFGQUZBIi8+PC9zdmc+')] bg-repeat-x"></div>
+
+    <div class="text-center mt-4 mb-6 border-b border-stone-300 border-dashed pb-6">
+        <h1 class="text-2xl font-black tracking-tighter">ISHERI <span class="text-amber-500">GRILLS & SUYA</span></h1>
+        <p class="text-xs text-stone-500 mt-1">Oko Erin • Lagos, Nigeria</p>
+        <p class="text-xs text-stone-500">Tel: 07079065750, 08086719794</p>
+    </div>
+    
+    <div class="text-center mb-6">
+        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+            <span class="text-3xl">✅</span>
+        </div>
+        <h2 class="text-lg font-bold text-green-600">Payment Successful!</h2>
+        <p class="text-xs text-stone-500 mt-1">Your food is entering the grill.</p>
+    </div>
+
+    <div class="space-y-3 text-sm px-2 mb-6 border-b border-stone-300 border-dashed pb-6">
+        <div class="flex justify-between">
+            <span class="text-stone-500">Order Ref:</span>
+            <span class="font-bold font-mono">{{ reference }}</span>
+        </div>
+        <div class="flex justify-between">
+            <span class="text-stone-500">Date:</span>
+            <span class="font-bold">{{ date|date:"M d, Y" }}</span>
+        </div>
+        <div class="flex justify-between">
+            <span class="text-stone-500">Status:</span>
+            <span class="font-bold text-amber-500">KITCHEN PREP</span>
+        </div>
+    </div>
+
+    
+    <div class="bg-stone-100 rounded-2xl p-4 my-6 text-center border-2 border-dashed border-stone-300">
+        <p class="text-xs font-bold text-stone-500 uppercase tracking-widest mb-3">Safe Delivery Code</p>
+        <div id="qrcode" class="flex justify-center mb-3"></div>
+        <script>new QRCode(document.getElementById("qrcode"), {text: "{{ reference }}", width: 120, height: 120});</script>
+        <p class="text-stone-600 text-xs">Or give rider this PIN:</p>
+        <p class="text-3xl font-black text-amber-500 tracking-[0.2em] mt-1">{{ reference|slice:"-4:" }}</p>
+    </div>
+
+    <div class="flex justify-between text-xl font-black px-2 mb-8">
+        <span>Amount Paid:</span>
+        <span>₦{{ total|floatformat:2 }}</span>
+    </div>
+    
+    <div class="flex gap-3">
+        <a href="{% url 'shop:home' %}" class="w-1/2 bg-stone-900 hover:bg-stone-800 text-white text-center font-bold py-3.5 rounded-xl shadow-lg transition text-xs uppercase tracking-wider">
+            Back Home
+        </a>
+        <button onclick="window.print()" class="w-1/2 bg-amber-500 hover:bg-amber-600 text-stone-900 font-bold py-3.5 rounded-xl shadow-lg transition text-xs uppercase tracking-wider flex items-center justify-center gap-2">
+            <span>📸 Save Receipt</span>
+        </button>
+    </div>
+</div>
+
+    <div x-data="{ reviewOpen: true, rating: 5 }" x-show="reviewOpen" class="fixed inset-0 z-[100] flex items-center justify-center bg-stone-900/80 backdrop-blur-sm px-4">
+        <div @click.away="reviewOpen = false" class="bg-stone-800 w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-stone-700 relative">
+            <button @click="reviewOpen = false" class="absolute top-4 right-4 text-stone-400 hover:text-white">✕</button>
+            <h2 class="text-2xl font-black text-white text-center mb-2">Rate Your Meal 🍔</h2>
+            <p class="text-stone-400 text-xs text-center mb-6">How was your Isheri Grills experience?</p>
+            
+            <form method="POST" action="{% url 'shop:submit_review' reference %}" class="space-y-4">
+                {% csrf_token %}
+                <div class="flex justify-center gap-2 text-3xl">
+                    <template x-for="i in 5">
+                        <button type="button" @click="rating = i" :class="rating >= i ? 'text-amber-500' : 'text-stone-600'" class="focus:outline-none transition">★</button>
+                    </template>
+                </div>
+                <input type="hidden" name="rating" :value="rating">
+                <textarea name="comment" rows="3" placeholder="Tell us what you loved..." class="w-full bg-stone-900 border border-stone-700 rounded-xl p-3 text-sm text-white focus:border-amber-500 outline-none"></textarea>
+                <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-stone-900 font-bold py-3.5 rounded-xl transition shadow-lg">Submit Review & Claim Cashback</button>
+            </form>
+        </div>
+    </div>
+
+{% endblock content %}

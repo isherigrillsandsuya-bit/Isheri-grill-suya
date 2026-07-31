@@ -1,0 +1,28 @@
+{% extends 'base/base.html' %}
+{% block content %}
+<div class="space-y-6 pb-4">
+    <div class="relative w-full h-72 bg-stone-900 rounded-3xl overflow-hidden shadow-2xl border border-stone-800">
+        <img src="https://picsum.photos/800/600?random={{ item.id }}" class="w-full h-full object-cover opacity-90" alt="{{ item.name }}">
+        <a href="javascript:history.back()" class="absolute top-4 left-4 bg-stone-900/80 backdrop-blur-md text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg shadow-lg">&larr;</a>
+    </div>
+
+    <div class="px-2">
+        <div class="flex justify-between items-start mb-2">
+            <a href="{% url 'shop:category' item.category.id %}" class="bg-stone-800 border border-stone-700 text-amber-500 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">{{ item.category.name }}</a>
+            <span class="bg-stone-100 text-stone-900 text-[10px] font-bold px-3 py-1 rounded-full flex items-center gap-1">⏱ Prep: {{ item.prep_time }}</span>
+        </div>
+        <h1 class="text-3xl font-black text-white leading-tight mb-2">{{ item.name }}</h1>
+        <p class="text-stone-400 text-sm leading-relaxed mb-6">{{ item.description }} Premium ingredients, freshly grilled upon order.</p>
+        
+        <div class="flex items-center justify-between bg-stone-800 p-4 rounded-2xl border border-stone-700 shadow-xl mb-8">
+            <div>
+                <p class="text-[10px] text-stone-400 uppercase tracking-widest mb-1">Total Price</p>
+                <span class="font-black text-amber-500 text-2xl">₦{{ item.price|floatformat:0 }}</span>
+            </div>
+            <button hx-post="{% url 'shop:add_to_cart' item.id %}" class="bg-red-600 hover:bg-red-500 active:scale-95 text-white font-black text-sm uppercase tracking-wider px-8 py-3.5 rounded-xl shadow-lg transition flex items-center gap-2">
+                <span>Add to Cart</span> 🛒
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock content %}
