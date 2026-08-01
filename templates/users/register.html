@@ -1,40 +1,73 @@
-{% extends 'base/base.html' %}
-{% block content %}
-<div class="mt-4 bg-stone-800 border border-stone-700 rounded-3xl p-6 shadow-2xl">
-    <div class="text-center mb-6">
-        <h1 class="text-2xl font-black text-white">Create Account 🔥</h1>
-        <p class="text-sm text-stone-400 mt-1">Join ISHERI GRILLS for fast checkouts</p>
-    </div>
-    
-    {% if messages %}
-    <div class="bg-red-500/20 border border-red-500 text-red-400 text-xs p-3 rounded-xl mb-4">
-        {% for message in messages %}{{ message }}{% endfor %}
-    </div>
-    {% endif %}
+{% extends "base/base.html" %}
 
-    <form method="POST" class="space-y-3">
-        {% csrf_token %}
-        <div>
-            <label class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-1">Full Name</label>
-            <input type="text" name="full_name" required class="w-full bg-stone-900 border border-stone-700 rounded-xl px-4 py-3 text-stone-100 focus:outline-none focus:border-amber-500">
+{% block title %}Create Account - Isheri Grills & Suya{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center min-h-[85vh] px-4 py-8">
+    <div class="w-full max-w-md bg-[#242424] rounded-2xl shadow-xl p-8 border border-gray-800">
+        
+        <div class="text-center mb-8">
+            <h1 class="text-2xl font-bold text-white tracking-tight">Create Account</h1>
+            <p class="text-sm text-gray-400 mt-2">Get ₦150 welcome bonus on your first order.</p>
         </div>
-        <div>
-            <label class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-1">Phone Number (For Delivery Riders)</label>
-            <input type="tel" name="phone" required class="w-full bg-stone-900 border border-stone-700 rounded-xl px-4 py-3 text-stone-100 focus:outline-none focus:border-amber-500">
-        </div>
-        <div>
-            <label class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-1">Email Address</label>
-            <input type="email" name="email" required class="w-full bg-stone-900 border border-stone-700 rounded-xl px-4 py-3 text-stone-100 focus:outline-none focus:border-amber-500">
-        </div>
-        <div>
-            <label class="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-1">Password</label>
-            <input type="password" name="password" required class="w-full bg-stone-900 border border-stone-700 rounded-xl px-4 py-3 text-stone-100 focus:outline-none focus:border-amber-500">
-        </div>
-        <button type="submit" class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3.5 rounded-xl shadow-lg mt-2 transition">Send Verification OTP</button>
-    </form>
-    
-    <p class="text-center text-xs text-stone-400 mt-5">
-        Already have an account? <a href="{% url 'users:login' %}" class="text-amber-500 font-bold hover:underline">Sign In</a>
-    </p>
+
+        <form method="POST" action="{% url 'users:register' %}" class="space-y-4">
+            {% csrf_token %}
+
+            {% if form.errors %}
+            <div class="bg-red-500/10 border border-isheri-red text-isheri-red p-3 rounded-lg text-sm">
+                Please correct the errors below.
+            </div>
+            {% endif %}
+
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-1" for="name">Full Name</label>
+                <input type="text" id="name" name="name" required 
+                    class="w-full bg-[#1A1A1A] border border-gray-700 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-isheri-red focus:ring-1 focus:ring-isheri-red transition-colors">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-1" for="email">Email Address</label>
+                <input type="email" id="email" name="email" required 
+                    class="w-full bg-[#1A1A1A] border border-gray-700 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-isheri-red focus:ring-1 focus:ring-isheri-red transition-colors">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-1" for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" required 
+                    class="w-full bg-[#1A1A1A] border border-gray-700 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-isheri-red focus:ring-1 focus:ring-isheri-red transition-colors"
+                    placeholder="080...">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1" for="password">Password</label>
+                    <input type="password" id="password" name="password" required 
+                        class="w-full bg-[#1A1A1A] border border-gray-700 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-isheri-red focus:ring-1 focus:ring-isheri-red transition-colors">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1" for="confirm_password">Confirm</label>
+                    <input type="password" id="confirm_password" name="confirm_password" required 
+                        class="w-full bg-[#1A1A1A] border border-gray-700 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-isheri-red focus:ring-1 focus:ring-isheri-red transition-colors">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-1" for="referral_code">Referral Code (Optional)</label>
+                <input type="text" id="referral_code" name="referral_code" 
+                    class="w-full bg-[#1A1A1A] border border-gray-700 text-gray-400 rounded-lg px-4 py-3 focus:outline-none focus:border-isheri-orange focus:ring-1 focus:ring-isheri-orange transition-colors">
+            </div>
+
+            <button type="submit" 
+                class="w-full bg-isheri-red hover:bg-red-700 text-white font-bold py-3.5 rounded-lg shadow-lg mt-4 hover:shadow-red-500/20 transition-all active:scale-[0.98]">
+                Create Account
+            </button>
+        </form>
+
+        <p class="text-center text-sm text-gray-400 mt-6">
+            Already have an account? 
+            <a href="{% url 'users:login' %}" class="text-isheri-red font-semibold hover:text-white transition-colors">Sign In</a>
+        </p>
+    </div>
 </div>
 {% endblock content %}

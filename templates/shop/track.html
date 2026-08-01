@@ -1,0 +1,73 @@
+{% extends "base/base.html" %}
+{% block title %}Track Order #{{ order_id }} - Isheri Grills{% endblock %}
+
+{% block content %}
+<div class="px-4 py-6 sm:px-0 max-w-lg mx-auto">
+    
+    <div class="flex items-center mb-8">
+        <a href="{% url 'shop:home' %}" class="w-10 h-10 bg-[#242424] rounded-full flex items-center justify-center border border-gray-800">
+            <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        </a>
+        <div class="ml-4">
+            <h1 class="text-xl font-bold text-white">Track Order</h1>
+            <p class="text-xs text-gray-400">Order #{{ order_id }}</p>
+        </div>
+    </div>
+
+    <div class="w-full h-64 bg-[#242424] rounded-3xl border border-gray-800 mb-8 overflow-hidden relative flex items-center justify-center shadow-inner">
+        <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+        <div class="text-center z-10">
+            <div class="w-12 h-12 bg-isheri-orange rounded-full flex items-center justify-center mx-auto mb-2 animate-bounce shadow-[0_10px_20px_rgba(255,140,0,0.4)]">
+                <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>
+            </div>
+            <span class="text-sm font-bold text-white bg-black/50 px-3 py-1 rounded-full backdrop-blur-md">Rider is 5 mins away</span>
+        </div>
+    </div>
+
+    <div class="bg-[#242424] rounded-3xl p-6 border border-gray-800 mb-6 relative">
+        <div class="absolute left-[43px] top-10 bottom-10 w-0.5 bg-gray-800 z-0"></div>
+        
+        <div class="space-y-6 relative z-10">
+            <div class="flex items-center">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center {% if status == 'Pending' or status == 'Kitchen' or status == 'Out for Delivery' %}bg-isheri-orange text-white{% else %}bg-gray-800 text-gray-500{% endif %}">✓</div>
+                <div class="ml-4">
+                    <h4 class="text-sm font-bold text-white">Order Accepted</h4>
+                    <p class="text-xs text-gray-400">12:45 PM</p>
+                </div>
+            </div>
+            <div class="flex items-center">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center {% if status == 'Kitchen' or status == 'Out for Delivery' %}bg-isheri-orange text-white shadow-[0_0_15px_rgba(255,140,0,0.5)]{% else %}bg-gray-800 text-gray-500{% endif %}">🔥</div>
+                <div class="ml-4">
+                    <h4 class="text-sm font-bold text-white">In the Kitchen</h4>
+                    <p class="text-xs text-gray-400">Grilling your suya to perfection.</p>
+                </div>
+            </div>
+            <div class="flex items-center">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center {% if status == 'Out for Delivery' %}bg-isheri-red text-white shadow-[0_0_15px_rgba(230,57,70,0.5)] animate-pulse{% else %}bg-gray-800 text-gray-500{% endif %}">🛵</div>
+                <div class="ml-4">
+                    <h4 class="text-sm font-bold text-white">Out for Delivery</h4>
+                    <p class="text-xs text-gray-400">Rider is on the way to you.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if status == 'Out for Delivery' %}
+    <div class="bg-gradient-to-r from-[#1A1A1A] to-[#242424] rounded-3xl p-5 border border-gray-700 flex items-center justify-between shadow-lg">
+        <div class="flex items-center">
+            <div class="w-14 h-14 bg-gray-800 rounded-full overflow-hidden border-2 border-isheri-orange">
+                <img src="https://ui-avatars.com/api/?name={{ rider_name }}&background=E63946&color=fff" alt="Rider" class="w-full h-full object-cover">
+            </div>
+            <div class="ml-3">
+                <h4 class="text-sm font-bold text-white">{{ rider_name }}</h4>
+                <p class="text-xs text-gray-400">Your Delivery Rider</p>
+            </div>
+        </div>
+        <a href="tel:{{ rider_phone }}" class="w-12 h-12 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center shadow-[0_5px_15px_rgba(34,197,94,0.3)] transition-transform active:scale-90">
+            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path></svg>
+        </a>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock content %}

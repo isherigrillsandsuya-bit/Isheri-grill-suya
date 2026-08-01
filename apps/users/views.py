@@ -2,11 +2,13 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from .models import CustomUser, OTPVerification
+from .emails import send_verification_otp, send_welcome_email
 import random
 
 def register_view(request):
     if request.method == 'POST':
-        full_name = request.POST.get('full_name')
+        # Safely handle 'name' (from our HTML) or 'full_name' 
+        full_name = request.POST.get('full_name') or request.POST.get('name')
         email = request.POST.get('email')
         phone = request.POST.get('phone')
         password = request.POST.get('password')
@@ -17,6 +19,8 @@ def register_view(request):
             
         # Create inactive user
         user = CustomUser.objects.create_user(email=email, phone_number=phone, password=password, full_name=full_name)
+        user.is_active = False # Explicitly lock account until OTP
+        user.save()
         
         # Generate 6-digit OTP
         otp_code = str(random.randint(100000, 999999))
@@ -28,6 +32,12 @@ def register_view(request):
         print(f"🔑 YOUR OTP CODE IS: {otp_code}")
         print("="*40 + "\n")
         
+        # Trigger the actual email (fails gracefully if .env is missing)
+        try:
+            send_verification_otp(email, full_name, otp_code)
+        except Exception as e:
+            print(f"Mail sending skipped/failed: {e}")
+
         request.session['verify_email'] = email
         return redirect('users:verify_otp')
         
@@ -47,13 +57,23 @@ def verify_otp_view(request):
             if otp_record:
                 otp_record.is_verified = True
                 otp_record.save()
+                
+                # Activate User
                 user.is_active = True
                 user.save()
+                
+                # Trigger Welcome Email with Bonus notice
+                try:
+                    send_welcome_email(user.email, getattr(user, 'full_name', 'Foodie'))
+                except Exception as e:
+                    print(f"Welcome Mail skipped/failed: {e}")
                 
                 # Log them in automatically
                 login(request, user)
                 del request.session['verify_email']
-                return redirect('shop:checkout')
+                
+                # Send to checkout or home based on flow
+                return redirect('shop:checkout') 
             else:
                 messages.error(request, "Invalid or expired OTP.")
         except CustomUser.DoesNotExist:
