@@ -17,7 +17,7 @@ class Wallet(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.user.email} - ₦{self.balance}"
+        return f'{self.user.email} - Balance: {self.balance}'
 
 class WalletTransaction(models.Model):
     TRANSACTION_TYPES = (
@@ -31,4 +31,4 @@ class WalletTransaction(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.transaction_type}: ₦{self.amount} for {self.wallet.user.email}"
+        return f'{self.transaction_type}: {self.amount} for {self.wallet.user.email}'
