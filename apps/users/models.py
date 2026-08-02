@@ -11,6 +11,15 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.username or self.email
 
+class OTPVerification(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='otp_records')
+    code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_used = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'OTP for {self.user.email}: {self.code}'
+
 class Wallet(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='wallet')
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
