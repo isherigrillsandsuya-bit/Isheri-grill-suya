@@ -12,8 +12,12 @@
     <div class="grid grid-cols-2 gap-3.5">
         {% for item in items %}
         <div class="bg-stone-800/80 border border-stone-700 rounded-2xl overflow-hidden shadow-lg flex flex-col justify-between">
-            <a href="{% url 'shop:product' item.id %}" class="w-full h-32 bg-stone-900 relative block">
-                <img src="https://picsum.photos/400/300?random={{ item.id }}" class="w-full h-full object-cover opacity-80" alt="{{ item.name }}">
+            <a href="{% url 'shop:product' item.id %}" class="w-full h-32 bg-stone-900 relative block overflow-hidden rounded-t-3xl">
+                {% if item.image %}
+                <img src="{{ item.image.url }}" class="w-full h-full object-cover opacity-80" alt="{{ item.name }}">
+                {% else %}
+                <img src="{% static 'images/placeholder-product.svg' %}" class="w-full h-full object-cover opacity-80" alt="{{ item.name }}">
+                {% endif %}
                 <span class="absolute top-2 right-2 text-[10px] font-bold bg-stone-100 text-stone-900 px-2 py-1 rounded-md flex items-center gap-1 shadow-lg">⏱ {{ item.prep_time }}</span>
             </a>
             <div class="p-3.5">

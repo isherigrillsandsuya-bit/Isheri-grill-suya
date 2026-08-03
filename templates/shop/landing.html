@@ -1,0 +1,74 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Welcome to Isheri Grills & Suya{% endblock %}
+
+{% block content %}
+<div class="min-h-[calc(100vh-6rem)] overflow-hidden rounded-[2rem] bg-[radial-gradient(circle_at_top,_rgba(255,140,0,0.18),_transparent_40%),_radial-gradient(circle_at_bottom_right,_rgba(230,57,70,0.2),_transparent_35%),_radial-gradient(circle_at_left,_rgba(15,23,42,0.8),_transparent_20%)] text-white">
+    <div class="max-w-5xl mx-auto px-4 py-10 sm:py-14">
+        <div class="grid grid-cols-1 gap-12 lg:grid-cols-[1.2fr_0.8fr] items-center">
+            <div class="space-y-6">
+                <span class="inline-flex items-center gap-2 rounded-full bg-isheri-red/10 text-isheri-red px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em]">Authentic Lagos Suya Experience</span>
+                <h1 class="text-4xl sm:text-5xl font-black leading-tight tracking-tight">Welcome to <span class="text-isheri-orange">Isheri Grills</span> — where flame-charred suya meets Lagos nightlife.</h1>
+                <p class="max-w-2xl text-sm sm:text-base text-stone-300 leading-relaxed">Discover premium suya, grills, and chill sides crafted for fast pickup, delivery, and unforgettable taste. Your next meal should be bold, spicy, and wholly Isheri.</p>
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+                    <a href="{% url 'shop:menu' %}" class="inline-flex items-center justify-center rounded-full bg-isheri-red px-6 py-3 text-sm font-bold uppercase tracking-[0.18em] shadow-lg shadow-isheri-red/20 transition hover:bg-red-700">Explore Menu</a>
+                    <a href="{% url 'shop:checkout' %}" class="inline-flex items-center justify-center rounded-full border border-stone-700 bg-stone-900/80 px-6 py-3 text-sm font-semibold text-stone-100 transition hover:border-stone-500">Quick Checkout</a>
+                </div>
+                <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    <div class="rounded-3xl bg-white/5 p-4 border border-white/10">
+                        <p class="text-xs uppercase text-stone-400 tracking-[0.2em]">Hot & Fresh</p>
+                        <p class="mt-2 text-lg font-bold text-white">Grilled daily</p>
+                    </div>
+                    <div class="rounded-3xl bg-white/5 p-4 border border-white/10">
+                        <p class="text-xs uppercase text-stone-400 tracking-[0.2em]">Fast Delivery</p>
+                        <p class="mt-2 text-lg font-bold text-white">Within Lagos</p>
+                    </div>
+                    <div class="rounded-3xl bg-white/5 p-4 border border-white/10">
+                        <p class="text-xs uppercase text-stone-400 tracking-[0.2em]">Cashback</p>
+                        <p class="mt-2 text-lg font-bold text-white">Earn on every order</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div class="relative overflow-hidden rounded-[2rem] border border-white/10 shadow-2xl shadow-black/30 bg-[#111827] landing-carousel">
+                    <div class="landing-slide" style="background-image: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url('{% static "images/hero-1.svg" %}')"></div>
+                    <div class="landing-slide" style="background-image: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url('{% static "images/hero-2.svg" %}')"></div>
+                    <div class="landing-slide" style="background-image: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url('{% static "images/hero-3.svg" %}')"></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-black/0"></div>
+                    <div class="absolute bottom-4 left-4 right-4 flex items-center justify-between text-sm text-white/80">
+                        <span class="rounded-full bg-black/50 px-3 py-2">Flame-grilled specials</span>
+                        <span class="rounded-full bg-black/50 px-3 py-2">Auto-rotating showcase</span>
+                    </div>
+                </div>
+                <div class="rounded-3xl border border-white/10 bg-[#111827]/90 p-5 sm:p-6">
+                    <h2 class="text-sm uppercase tracking-[0.3em] text-amber-400">Fresh off the grill</h2>
+                    <p class="mt-3 text-sm leading-relaxed text-stone-300">Slide through our curated food showcase and tap ‘Explore Menu’ to order from the best suya and grills in town.</p>
+                </div>
+            </div>
+        </div>
+
+        {% if categories %}
+        <div class="mt-12 rounded-[2rem] border border-white/10 bg-slate-950/80 p-6 shadow-2xl shadow-black/20">
+            <div class="mb-6 flex items-center justify-between gap-4">
+                <div>
+                    <p class="text-xs uppercase tracking-[0.3em] text-stone-400">Popular categories</p>
+                    <h2 class="mt-2 text-2xl font-black text-white">Order from top picks</h2>
+                </div>
+                <a href="{% url 'shop:menu' %}" class="primary-button inline-flex items-center rounded-full bg-isheri-red px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-white shadow-lg shadow-isheri-red/20 hover:bg-red-700">View full menu</a>
+            </div>
+            <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                {% for category in categories %}
+                <a href="{% url 'shop:category' category.id %}" class="group block rounded-3xl border border-white/10 bg-slate-950/90 p-5 transition hover:border-amber-500 hover:bg-slate-900/95">
+                    <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-isheri-red/10 text-2xl font-black text-isheri-red">{{ category.name|slice:":1"|upper }}</div>
+                    <h3 class="text-lg font-bold text-white">{{ category.name }}</h3>
+                    <p class="mt-2 text-sm text-stone-400">{{ category.description|default:'Bold flavor, quick pickup, and craveable sides.' }}</p>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock content %}

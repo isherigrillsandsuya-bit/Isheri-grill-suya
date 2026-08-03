@@ -75,7 +75,11 @@ DATABASES = {
 # If deploying to Render/Supabase, use dj_database_url
 if os.environ.get('DATABASE_URL'):
     import dj_database_url
-    DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
+    database_url = os.environ['DATABASE_URL']
+    if database_url.startswith('sqlite:'):
+        DATABASES['default'] = dj_database_url.config(default=database_url, conn_max_age=600, ssl_require=False)
+    else:
+        DATABASES['default'] = dj_database_url.config(default=database_url, conn_max_age=600, ssl_require=True)
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [

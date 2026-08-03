@@ -1,0 +1,13 @@
+<svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg" fill="none">
+  <defs>
+    <linearGradient id="heroGlow2" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#E63946" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#FF8C00" stop-opacity="0.1"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" rx="60" fill="#111827"/>
+  <ellipse cx="600" cy="410" rx="485" ry="325" fill="url(#heroGlow2)" opacity="0.18"/>
+  <path d="M180 520C320 410 430 370 520 420C620 475 740 500 860 450C950 415 1020 330 1080 220" stroke="#F59E0B" stroke-width="30" stroke-linecap="round" opacity="0.95"/>
+  <path d="M240 280C330 230 420 250 512 290C615 340 720 380 840 360C930 345 1020 297 1094 220" stroke="#fff" stroke-width="20" stroke-linecap="round" opacity="0.7"/>
+  <circle cx="940" cy="170" r="72" fill="#E63946" opacity="0.7"/>
+</svg>

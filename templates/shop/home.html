@@ -21,62 +21,50 @@
 </nav>
 
 <div class="py-6 px-4 sm:px-0 space-y-10">
-    
-    <section id="cat-suya" class="scroll-mt-24">
+    {% for category in categories %}
+    <section id="cat-{{ category.id }}" class="scroll-mt-24">
         <h2 class="text-xl font-bold text-white mb-4 flex items-center">
-            Premium Suya
+            {{ category.name }}
             <span class="ml-2 h-px flex-1 bg-gray-800"></span>
         </h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            
-            <div class="flex bg-[#242424] rounded-2xl p-2.5 border border-gray-800 hover:border-gray-700 transition-colors shadow-sm group">
-                <div class="w-28 h-28 shrink-0 bg-gray-900 rounded-xl overflow-hidden relative">
-                    <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&auto=format&fit=crop&q=60" 
-                         alt="Beef Suya" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            {% with available_items=category.items.filter(is_available=True) %}
+                {% if available_items.exists %}
+                    {% for item in available_items %}
+                    <div class="flex bg-[#242424] rounded-2xl p-2.5 border border-gray-800 hover:border-gray-700 transition-colors shadow-sm group">
+                        <div class="w-28 h-28 shrink-0 bg-gray-900 rounded-xl overflow-hidden relative">
+                            {% if item.image %}
+                            <img src="{{ item.image.url }}" alt="{{ item.name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            {% else %}
+                            <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=500&q=60" alt="{{ item.name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            {% endif %}
+                        </div>
+                        <div class="flex flex-col justify-between ml-4 flex-1 py-1">
+                            <div>
+                                <h3 class="text-base font-bold text-gray-100 leading-tight">{{ item.name }}</h3>
+                                <p class="text-xs text-gray-400 mt-1 line-clamp-2">{{ item.description }}</p>
+                            </div>
+                            <div class="flex items-center justify-between mt-2">
+                                <span class="text-isheri-orange font-bold">₦{{ item.price|floatformat:0 }}</span>
+                                <button hx-post="{% url 'shop:add_to_cart' item.id %}" 
+                                        hx-target="#cart-drawer-container"
+                                        hx-swap="innerHTML"
+                                        class="bg-isheri-red hover:bg-red-700 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-lg shadow-md active:scale-90 transition-transform">
+                                    +
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                
-                <div class="flex flex-col justify-between ml-4 flex-1 py-1">
-                    <div>
-                        <h3 class="text-base font-bold text-gray-100 leading-tight">Spicy Beef Suya</h3>
-                        <p class="text-xs text-gray-400 mt-1 line-clamp-2">Authentic yaji spice blend, grilled over open flames. Served with onions and tomatoes.</p>
-                    </div>
-                    
-                    <div class="flex items-center justify-between mt-2">
-                        <span class="text-isheri-orange font-bold">₦2,500</span>
-                        
-                        <button hx-post="/shop/cart/add/1/" 
-                                hx-target="#cart-drawer-container"
-                                hx-swap="innerHTML"
-                                class="bg-isheri-red hover:bg-red-700 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-lg shadow-md active:scale-90 transition-transform">
-                            +
-                        </button>
-                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="col-span-2 text-center py-10">
+                    <p class="text-stone-500 text-sm">No items currently available in this category.</p>
                 </div>
-            </div>
-
-            <div class="flex bg-[#242424] rounded-2xl p-2.5 border border-gray-800 hover:border-gray-700 transition-colors shadow-sm group">
-                <div class="w-28 h-28 shrink-0 bg-gray-900 rounded-xl overflow-hidden relative">
-                    <img src="https://images.unsplash.com/photo-1606622839958-384ef8471da3?w=500&auto=format&fit=crop&q=60" 
-                         alt="Chicken Suya" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                </div>
-                <div class="flex flex-col justify-between ml-4 flex-1 py-1">
-                    <div>
-                        <h3 class="text-base font-bold text-gray-100 leading-tight">Chicken Suya (Quarter)</h3>
-                        <p class="text-xs text-gray-400 mt-1 line-clamp-2">Tender, juicy chicken infused with our signature Isheri rub.</p>
-                    </div>
-                    <div class="flex items-center justify-between mt-2">
-                        <span class="text-isheri-orange font-bold">₦3,800</span>
-                        <button hx-post="/shop/cart/add/2/" hx-target="#cart-drawer-container" hx-swap="innerHTML"
-                                class="bg-isheri-red hover:bg-red-700 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-lg shadow-md active:scale-90 transition-transform">
-                            +
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
+                {% endif %}
+            {% endwith %}
         </div>
     </section>
-
+    {% endfor %}
 </div>
 {% endblock content %}
