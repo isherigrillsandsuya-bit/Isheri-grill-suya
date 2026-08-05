@@ -1,0 +1,33 @@
+{% load static %}
+<div class="mb-4">
+  <div id="promo-carousel" class="flex gap-3 overflow-x-auto hide-scrollbar py-2 px-2">
+    {% for p in promos %}
+    <a href="{{ p.link|default:'#' }}" class="promo-item flex-shrink-0 bg-white/5 rounded-xl px-4 py-3 min-w-[240px] flex items-center gap-3 border border-white/10">
+      {% if p.image %}
+      <img src="{{ p.image.url }}" class="w-12 h-12 object-cover rounded-md" alt="{{ p.title }}">
+      {% else %}
+      <div class="w-12 h-12 rounded-md bg-isheri-red/20 flex items-center justify-center font-bold text-isheri-red">%{{ p.discount_percent }}</div>
+      {% endif %}
+      <div>
+        <div class="text-sm font-semibold text-white">{{ p.title }}</div>
+        <div class="text-xs text-stone-400">{{ p.subtitle }}</div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</div>
+
+<script>
+  // Auto-scroll the promo carousel slowly
+  (function(){
+    const c = document.getElementById('promo-carousel');
+    if(!c) return;
+    let pos = 0;
+    setInterval(()=>{
+      if(!c.scrollWidth) return;
+      pos += 1;
+      if(pos > c.scrollWidth - c.clientWidth) pos = 0;
+      c.scrollTo({left: pos, behavior: 'smooth'});
+    }, 2500);
+  })();
+</script>

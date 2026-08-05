@@ -6,6 +6,7 @@
 {% block content %}
 <div class="min-h-[calc(100vh-6rem)] overflow-hidden rounded-[2rem] bg-[radial-gradient(circle_at_top,_rgba(255,140,0,0.18),_transparent_40%),_radial-gradient(circle_at_bottom_right,_rgba(230,57,70,0.2),_transparent_35%),_radial-gradient(circle_at_left,_rgba(15,23,42,0.8),_transparent_20%)] text-white">
     <div class="max-w-5xl mx-auto px-4 py-10 sm:py-14">
+        {% include 'shop/_promo_carousel.html' %}
         <div class="grid grid-cols-1 gap-12 lg:grid-cols-[1.2fr_0.8fr] items-center">
             <div class="space-y-6">
                 <span class="inline-flex items-center gap-2 rounded-full bg-isheri-red/10 text-isheri-red px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em]">Authentic Lagos Suya Experience</span>
@@ -33,9 +34,9 @@
 
             <div class="space-y-4">
                 <div class="relative overflow-hidden rounded-[2rem] border border-white/10 shadow-2xl shadow-black/30 bg-[#111827] landing-carousel">
-                    <div class="landing-slide" style="background-image: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url('{% static "images/hero-1.svg" %}')"></div>
-                    <div class="landing-slide" style="background-image: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url('{% static "images/hero-2.svg" %}')"></div>
-                    <div class="landing-slide" style="background-image: linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url('{% static "images/hero-3.svg" %}')"></div>
+                    <div class="landing-slide hero-slide-1"></div>
+                    <div class="landing-slide hero-slide-2"></div>
+                    <div class="landing-slide hero-slide-3"></div>
                     <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-black/0"></div>
                     <div class="absolute bottom-4 left-4 right-4 flex items-center justify-between text-sm text-white/80">
                         <span class="rounded-full bg-black/50 px-3 py-2">Flame-grilled specials</span>

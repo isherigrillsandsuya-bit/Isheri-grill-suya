@@ -38,9 +38,12 @@
             </button>
         </form>
 
-        <p class="text-sm text-gray-400 mt-8">
-            Didn't receive the email? 
-            <a href="{% url 'users:register' %}" class="text-isheri-orange font-semibold hover:text-white transition-colors">Try registering again</a>
+        <p class="text-sm text-gray-400 mt-4">
+            Didn’t receive the email? 
+            <a href="{% url 'users:resend_otp' %}" class="text-isheri-orange font-semibold hover:text-white transition-colors">Resend verification code</a>
+        </p>
+        <p class="text-sm text-gray-400 mt-4">
+            If the code still doesn’t arrive, check your spam folder or try registering with a different email.
         </p>
     </div>
 </div>

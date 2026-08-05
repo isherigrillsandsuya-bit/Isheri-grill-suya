@@ -40,6 +40,19 @@
     </div>
 
     <div class="w-full space-y-3">
+        <div class="bg-[#121212] border border-isheri-orange/20 rounded-3xl p-4 text-left space-y-3">
+            <h3 class="text-sm font-bold text-white">Delivery confirmation</h3>
+            <p class="text-xs text-stone-400">Show this QR code to your rider or use the code below if the scanner is unavailable.</p>
+            {% if customer_pin and qr_payload %}
+            <div class="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ qr_payload|urlencode }}" alt="Order QR code" class="w-36 h-36 rounded-3xl bg-white/10 border border-white/10" />
+                <div class="text-center sm:text-left">
+                    <p class="text-xs uppercase text-stone-400 tracking-[0.24em] mb-2">Customer PIN</p>
+                    <div class="inline-flex items-center justify-center rounded-3xl bg-white/10 border border-white/10 px-4 py-3 text-lg font-bold text-white tracking-[0.24em]">{{ customer_pin }}</div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
         <a href="{% url 'shop:track' order_id %}" class="block w-full bg-isheri-red hover:bg-red-700 text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-[0.98]">
             Track Order Live
         </a>
@@ -50,3 +63,77 @@
 
 </div>
 {% endblock content %}
+
+{% block extra_scripts %}
+<div id="review-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50">
+    <div class="bg-[#0b1220] rounded-xl p-6 w-11/12 max-w-md text-center border border-white/10">
+        <h3 class="text-lg font-bold text-white mb-2">How was your delivery?</h3>
+        <p class="text-sm text-stone-400 mb-4">Rate your experience — it only takes a second.</p>
+        <div id="stars" class="flex justify-center gap-2 mb-4">
+            <button data-value="1" class="star-btn w-10 h-10 rounded-full bg-white/5 text-white">★</button>
+            <button data-value="2" class="star-btn w-10 h-10 rounded-full bg-white/5 text-white">★</button>
+            <button data-value="3" class="star-btn w-10 h-10 rounded-full bg-white/5 text-white">★</button>
+            <button data-value="4" class="star-btn w-10 h-10 rounded-full bg-white/5 text-white">★</button>
+            <button data-value="5" class="star-btn w-10 h-10 rounded-full bg-white/5 text-white">★</button>
+        </div>
+        <textarea id="review-feedback" placeholder="Any notes for the rider?" class="w-full p-3 rounded-md bg-[#0f1724] text-sm text-white border border-white/5 mb-4"></textarea>
+        <div class="flex gap-3 justify-center">
+            <button id="submit-review" class="px-4 py-2 bg-isheri-red text-white rounded">Submit</button>
+            <button id="close-review" class="px-4 py-2 bg-gray-700 text-white rounded">Later</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Show modal shortly after successful checkout
+    document.addEventListener('DOMContentLoaded', function(){
+        setTimeout(()=>{
+            const modal = document.getElementById('review-modal');
+            if(modal) modal.classList.remove('hidden');
+        }, 1200);
+
+        let selected = 5;
+        document.querySelectorAll('.star-btn').forEach(b => {
+            b.addEventListener('click', (e)=>{
+                selected = parseInt(b.getAttribute('data-value'));
+                document.querySelectorAll('.star-btn').forEach((s, idx)=>{ s.style.opacity = (idx < selected) ? '1' : '0.35'; });
+            });
+        });
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        document.getElementById('submit-review').addEventListener('click', ()=>{
+            const feedback = document.getElementById('review-feedback').value;
+            fetch('{% url "shop:submit_review" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type':'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: new URLSearchParams({order_id: '{{ order_id }}', rating: selected, feedback: feedback})
+            }).then(r => r.text()).then(html=>{
+                const modal = document.getElementById('review-modal');
+                modal.innerHTML = html;
+                setTimeout(()=>{ if(modal) modal.classList.add('hidden'); }, 5000);
+            }).catch(()=>{ alert('Failed to submit review.'); });
+        });
+
+        document.getElementById('close-review').addEventListener('click', ()=>{
+            document.getElementById('review-modal').classList.add('hidden');
+        });
+    });
+</script>
+{% endblock %}

@@ -1,13 +1,18 @@
+import random
+import uuid
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Category, MenuItem
+from .models import Category, MenuItem, PromoBanner, Order, OrderItem, DeliverySignature
 from apps.users.models import CustomUser, Wallet, WalletTransaction
+from apps.users.emails import send_order_receipt
 
 def landing_view(request):
     """A branded landing experience shown at the app root."""
     categories = Category.objects.order_by('display_order', 'name')[:4]
-    return render(request, 'shop/landing.html', {'categories': categories})
+    promos = PromoBanner.objects.filter(is_active=True).order_by('display_order')[:6]
+    return render(request, 'shop/landing.html', {'categories': categories, 'promos': promos})
 
 
 def menu_view(request):
@@ -79,17 +84,59 @@ def checkout_view(request):
     platform_fee = 70
     delivery_fee = 1500 # Dynamic Google Maps fee hooks here
     total_amount = subtotal + platform_fee + delivery_fee
-    
+
     cart_items = [{'name': item['name'], 'quantity': item['quantity'], 'total': item['price'] * item['quantity']} for item in cart.values()]
-    
+    checkout_details = request.session.get('checkout_details', {})
+
     context = {
         'cart_items': cart_items,
         'subtotal': subtotal,
         'platform_fee': platform_fee,
         'delivery_fee': delivery_fee,
         'total_amount': total_amount,
+        'checkout_details': checkout_details,
     }
     return render(request, 'shop/checkout.html', context)
+
+
+def initialize_payment_view(request):
+    """Accept checkout details and route the user into the success flow."""
+    if not request.user.is_authenticated:
+        messages.info(request, "Please sign in or create an account to complete your Isheri Grills order.")
+        return redirect('users:login')
+
+    cart = request.session.get('cart', {})
+    if not cart:
+        return redirect('shop:home')
+
+    if request.method != 'POST':
+        return redirect('shop:checkout')
+
+    delivery_address = request.POST.get('delivery_address', '').strip()
+    phone_number = request.POST.get('phone_number', '').strip()
+
+    if not delivery_address:
+        messages.error(request, 'Please add a delivery address to continue.')
+        return redirect('shop:checkout')
+
+    if phone_number:
+        request.user.phone_number = phone_number
+        request.user.save(update_fields=['phone_number'])
+
+    subtotal = sum(item['price'] * item['quantity'] for item in cart.values())
+    total_amount = subtotal + 70 + 1500
+
+    request.session['checkout_details'] = {
+        'address': delivery_address,
+        'phone_number': phone_number,
+        'subtotal': subtotal,
+        'total_amount': total_amount,
+    }
+    request.session.modified = True
+
+    messages.success(request, 'Your order details were captured successfully.')
+    return redirect('shop:success')
+
 
 def payment_success_view(request):
     """
@@ -148,16 +195,55 @@ def payment_success_view(request):
     # Clear Cart
     request.session['cart'] = {}
     request.session.modified = True
-    
-    import uuid
-    order_id = str(uuid.uuid4()).split('-')[0].upper()
-    
+
+    checkout_details = request.session.get('checkout_details', {})
+    delivery_address = checkout_details.get('address', 'Delivery address not provided')
+    phone_number = checkout_details.get('phone_number', '')
+
+    order_number = str(uuid.uuid4()).split('-')[0].upper()
+    order = Order.objects.create(
+        order_number=order_number,
+        user=request.user,
+        subtotal=subtotal,
+        delivery_fee=1500,
+        customer_platform_fee=70,
+        total_amount=subtotal + 70 + 1500,
+        delivery_address=delivery_address,
+        status='Pending',
+    )
+
+    for item_data in cart.values():
+        item = MenuItem.objects.get(id=item_data['id'])
+        OrderItem.objects.create(
+            order=order,
+            item=item,
+            price=item_data['price'],
+            quantity=item_data['quantity'],
+        )
+
+    signature = DeliverySignature.objects.create(
+        order=order,
+        qr_payload=f"isheri://order/{order_number}",
+        customer_pin=f"{random.randint(100000, 999999)}",
+        rider_pin=f"{random.randint(100000, 999999)}",
+    )
+
     context = {
-        'order_id': order_id,
+        'order_id': order_number,
         'subtotal': subtotal,
         'cashback_earned': cashback_earned,
         'total_paid': subtotal + 70 + 1500,
+        'address': delivery_address,
+        'phone_number': phone_number,
+        'customer_pin': signature.customer_pin,
+        'qr_payload': signature.qr_payload,
     }
+
+    # Send order receipt email to the customer (best-effort)
+    try:
+        send_order_receipt(request.user.email, request.user.full_name, context)
+    except Exception as e:
+        print(f"Order receipt email failed: {e}")
     return render(request, 'shop/receipt.html', context)
 
 def track_order_view(request, order_id):
@@ -168,3 +254,25 @@ def track_order_view(request, order_id):
         'rider_phone': '08123456789'
     }
     return render(request, 'shop/track.html', context)
+
+
+def submit_review_view(request):
+    if request.method != 'POST' or not request.user.is_authenticated:
+        return redirect('shop:home')
+
+    order_id = request.POST.get('order_id')
+    rating = int(request.POST.get('rating', 0))
+    feedback = request.POST.get('feedback', '').strip()
+
+    from .models import DeliveryReview
+
+    if not order_id or rating <= 0:
+        return redirect('shop:home')
+
+    try:
+        DeliveryReview.objects.create(order_id=order_id, user=request.user, rating=rating, feedback=feedback)
+    except Exception as e:
+        print(f"Failed to save review: {e}")
+
+    # Thank you fragment
+    return render(request, 'shop/partials/review_thanks.html', {'rating': rating})

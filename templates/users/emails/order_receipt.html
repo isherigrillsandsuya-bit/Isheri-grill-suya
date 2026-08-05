@@ -1,0 +1,24 @@
+<html>
+  <body style="font-family:system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; color:#111;">
+    <div style="max-width:600px;margin:0 auto;padding:24px;background:#fff;border-radius:8px;">
+      <h2 style="color:#111;font-weight:800">Your Isheri Grills Receipt</h2>
+      <p style="color:#444">Hi {{ name }},</p>
+      <p style="color:#444">Thanks for your order. Here are the details:</p>
+      <ul style="color:#444">
+        <li>Order: {{ order_id }}</li>
+        <li>Subtotal: ₦{{ subtotal }}</li>
+        <li>Cashback earned: ₦{{ cashback_earned }}</li>
+        <li>Total paid: ₦{{ total_paid }}</li>
+        <li>Delivery address: {{ address }}</li>
+      </ul>
+      {% if customer_pin %}
+      <p style="color:#444">Customer confirmation PIN: <strong>{{ customer_pin }}</strong></p>
+      {% endif %}
+      {% if qr_payload %}
+      <p style="color:#444">Open this link to share your QR proof: <a href="{{ qr_payload }}">View QR delivery code</a></p>
+      {% endif %}
+      <p style="color:#666">If you have any issues, reply to this email and we'll help.</p>
+      <p style="color:#666">— The Isheri Grills Team</p>
+    </div>
+  </body>
+</html>

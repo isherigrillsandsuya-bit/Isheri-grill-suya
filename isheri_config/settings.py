@@ -108,8 +108,40 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Custom Auth User Model mapping
 AUTH_USER_MODEL = 'users.CustomUser'
+AUTHENTICATION_BACKENDS = [
+    'apps.users.backends.EmailBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
 
 # Auth URLs mapping
 LOGIN_URL = '/auth/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/auth/login/'
+
+# Email configuration: default to console backend for local development
+EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'Isheri Grills <noreply@isherigrills.local>')
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'localhost')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 25))
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'False') == 'True'
+EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False') == 'True'
+
+# If RESEND_API_KEY is provided, configure SMTP to use Resend's SMTP relay
+if os.environ.get('RESEND_API_KEY'):
+    RESEND_API_KEY = os.environ['RESEND_API_KEY']
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.resend.com')
+    EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
+    # Resend SMTP uses 'api' as the username and the API key as the password by default
+    EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'api')
+    EMAIL_HOST_PASSWORD = RESEND_API_KEY
+    EMAIL_USE_TLS = True
+
+# Use a local sqlite database for development/tests when DATABASE_URL is not provided
+if DEBUG and not os.environ.get('DATABASE_URL'):
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }

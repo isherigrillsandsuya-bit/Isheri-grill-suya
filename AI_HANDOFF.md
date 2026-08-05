@@ -1,99 +1,107 @@
-# AI ASSISTANT HAND-OFF NOTE: ISHERI GRILLS & SUYA
-**Target Workspace:** `~/Desktop/Isheri-grill-suya`
-**Tech Stack:** Python 3.x / Django 5.x / PostgreSQL (Supabase) / Tailwind CSS / HTMX & Alpine.js / Gunicorn / WhiteNoise
-**Deployment Target:** Render (Free Tier Web Service)
+# AI Assistant Hand-Off Note: Isheri Grills & Suya
+
+**Target workspace:** Isheri Grills & Suya Django project
+**Tech stack:** Python / Django / PostgreSQL / Tailwind CSS / HTMX / Alpine.js / Gunicorn
+**Deployment target:** Render
 
 ---
 
-## 1. ARCHITECTURE & DIRECTORY LAYOUT
-The project follows a clean, modular multi-app Django structure to avoid namespace collisions and circular imports:
-```
+## 1. Project structure
+
+The project is organized as a modular Django monolith with app-specific responsibilities:
+
+```text
 isheri-grill-suya/
-
 ├── apps/
-
-│   ├── shop/          # Menu, categories, inventory toggles, cart logic
-
-│   ├── users/         # CustomUser, Wallet, WalletTransaction, OTP verification
-
-│   ├── logistics/     # Delivery calculations, rider management, Google Maps Distance Matrix
-
-│   └── support/       # Customer support routing & contact modules
-
-├── isheri_config/     # Core settings, WSGI, URLs configuration
-
-├── templates/         # Global & app-scoped HTML templates (Tailwind + Alpine.js)
-
-├── static/            # CSS, JS, and product media assets
-
+│   ├── shop/         # Menu, categories, cart, checkout, kitchen views
+│   ├── users/        # Authentication, wallet, OTP, user profile data
+│   ├── logistics/    # Delivery calculations, rider dashboard, mapping helpers
+│   └── support/      # Support and contact-related flows
+├── isheri_config/    # Settings, URL routing, WSGI/ASGI entry points
+├── templates/        # Base and app templates
+├── static/           # CSS, JS, and static assets
 ├── manage.py
-
 ├── requirements.txt
-
-└── .env               # Local environment configuration (IGNORED BY GIT)
+└── .env              # Local environment file; do not commit
 ```
----
-
-## 2. CORE DATABASE MODELS CONFIGURED (`apps/`)
-- **`apps.users.models.CustomUser`**: Inherits from `AbstractUser`. Tracks `phone_number`, `is_verified` (Boolean), `otp_code`, `referral_code`, and `referred_by`.
-- **`apps.users.models.OTPVerification`**: Manages secure 6-digit cryptographic verification codes for registration/login.
-- **`apps.users.models.Wallet` & `WalletTransaction`**: Handles cashback, referral bonuses, and secure credit/debit transaction logs.
-- **`apps.shop.models`**: Category, MenuItem (with real-time `is_available` toggles for kitchen stock control), Order, and OrderItem.
 
 ---
 
-## 3. CURRENT ENVIRONMENT CONFIGURATION KEYS
-The app reads parameters directly via `os.getenv()` in `isheri_config/settings.py`. 
-*Note for local `.env` vs Render Cloud:* Do **not** commit `.env`. Production values are mapped securely on Render.
+## 2. Core models and modules
 
-### **Required Environment Variables Template:**
+- `apps.users.models.CustomUser`: extends `AbstractUser` and tracks phone verification, OTPs, referrals, and wallet state.
+- `apps.users.models.OTPVerification`: stores short-lived verification codes.
+- `apps.users.models.Wallet` and `WalletTransaction`: manage balance changes and audit-friendly logs.
+- `apps.shop.models`: covers categories, menu items, orders, and line items.
+
+---
+
+## 3. Environment configuration template
+
+The app reads settings from environment variables in `isheri_config/settings.py`. Keep local secrets out of version control and use Render environment variables in production.
+
 ```env
 DEBUG=False
-SECRET_KEY=django-insecure-9q#v$m8w2z-isheri-grills-suya-production-key-4x!p
+SECRET_KEY=replace-with-strong-secret
 ALLOWED_HOSTS=localhost,127.0.0.1,.onrender.com
 
-# Database (Supabase PostgreSQL Session Pooler URL)
+# Database
 DB_ENGINE=django.db.backends.postgresql
-DB_NAME=postgres
-DB_USER=postgres.tudftygmwfjmllqrztdr
-DB_PASSWORD=Ka$kaz@zs/z@z6
-DB_HOST=aws-0-eu-central-1.pooler.supabase.co
-DB_PORT=6543
+DB_NAME=your_db_name
+DB_USER=your_db_user
+DB_PASSWORD=replace-with-db-password
+DB_HOST=your_db_host
+DB_PORT=5432
 
-# Payment Gateway (Paystack)
-PAYSTACK_PUBLIC_KEY=pk_test_62144fb8b8c3895bb
+# Payment gateway
+PAYSTACK_PUBLIC_KEY=replace-with-paystack-public-key
+PAYSTACK_SECRET_KEY=replace-with-paystack-secret-key
 
-# Email Engine (Resend API SMTP)
+# Email
 EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
-EMAIL_HOST=smtp.resend.com
+EMAIL_HOST=smtp.example.com
 EMAIL_PORT=587
 EMAIL_USE_TLS=True
-EMAIL_HOST_USER=resend
-EMAIL_HOST_PASSW
-DEFAULT_FROM_EMAIL=Isheri Grills <onboarding@resend.dev>
+EMAIL_HOST_USER=replace-with-email-user
+EMAIL_HOST_PASSWORD=replace-with-email-password
+DEFAULT_FROM_EMAIL=Isheri Grills <hello@example.com>
 
-# Logistics (Google Maps API)
-GOOGLE_MAPS_API_KEY=AIzaSy_your_google_maps_key_here
-```
+# Maps
+GOOGLE_MAPS_API_KEY=replace-with-google-maps-keyyment notes
 
-## 4. RENDER DEPLOYMENT SPECIFICATIONS
-If managing builds or manual configurations on Render, adhere strictly to these settings:
+Use these deployment settings when configuring the Render service:
 
-- **Root Directory:** Blank (`.`)
-- **Runtime:** `Python 3`
-- **Build Command:** ```bash
+- Root directory: `.`
+- Runtime: `Python 3`
+- Build command:
 
+```bash
 pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate
-- **Start Command:** ```bash
-
-gunicorn isheri_config.wsgi:application
-
 ```
 
-## 5. IMMEDIATE NEXT TASKS FOR VS CODE AI
-When you resume work in VS Code, tackle these pending items in order:
+- Start command:
 
-1. **Verify Database Connection Locally:** Run `python manage.py migrate` with your Supabase credentials active to ensure all migrations run smoothly.
-2. **Checkout Templates & Frontend Views:** Inspect `apps/shop/views.py` and `templates/` to make sure the mobile cart, checkout flow, and HTMX triggers connect seamlessly to backend endpoints.
-3. **Seed Initial Menu Items:** Run or write a management command to populate default menu items (Suya, Shawarma, Asun, Drinks) so products render dynamically on the UI.
-4. **Test Payment & Webhooks:** Verify that Paystack initialize/verify endpoints handle orders correctly.
+```bash
+gunicorn isheri_config.wsgi:application
+```
+
+---
+
+## 5. Current audit snapshot
+
+### Status
+
+- ✅ Core Django app structure is present.
+- ✅ Base templates and storefront pages are in place.
+- ⚠️ Several template and styling issues were found and cleaned up.
+- ⚠️ Remaining work is mostly around runtime validation and checkout/payment integration.
+
+### Remaining fixes (todo list)
+
+- [x] Restore the checkout/payment handoff route and connect it to the storefront.
+- [x] Capture delivery details from the checkout form and carry them into the success/receipt flow.
+- [ ] Verify the local database connection with the real environment values.
+- [ ] Validate the checkout and cart flow end to end.
+- [ ] Seed initial menu items for the storefront.
+- [ ] Test payment initialization and verification flows once Paystack credentials are configured.
+- [ ] Review the production settings and confirm the secret handling strategy.

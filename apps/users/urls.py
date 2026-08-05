@@ -9,6 +9,7 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('register/', views.register_view, name='register'),
     path('verify-otp/', views.verify_otp_view, name='verify_otp'),
+    path('verify-otp/resend/', views.resend_otp_view, name='resend_otp'),
     path('logout/', views.logout_view, name='logout'),
 
     # Password Reset Flow (Using Django's built-in views)

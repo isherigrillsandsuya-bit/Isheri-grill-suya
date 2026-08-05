@@ -25,6 +25,7 @@ body {
 .site-header,
 .site-footer,
 .bottom-nav {
+  -webkit-backdrop-filter: saturate(180%) blur(16px);
   backdrop-filter: saturate(180%) blur(16px);
 }
 
@@ -84,4 +85,16 @@ body.hide-bottom-nav .bottom-nav {
 
 .landing-slide.opacity-100 {
   opacity: 1;
+}
+
+.hero-slide-1 {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)), url('/static/images/hero-1.svg');
+}
+
+.hero-slide-2 {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)), url('/static/images/hero-2.svg');
+}
+
+.hero-slide-3 {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)), url('/static/images/hero-3.svg');
 }

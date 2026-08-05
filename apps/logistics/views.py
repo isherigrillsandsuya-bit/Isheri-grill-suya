@@ -22,13 +22,15 @@ def verify_safe_delivery(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     if request.method == 'POST':
         pin_entered = request.POST.get('delivery_pin', '').strip()
-        # The PIN is the last 4 characters of the order reference
-        correct_pin = order.order_number[-4:] 
-        
-        if pin_entered.upper() == correct_pin.upper():
+        signature = getattr(order, 'signature', None)
+        correct_pin = signature.rider_pin if signature and signature.rider_pin else order.order_number[-4:]
+
+        if pin_entered == correct_pin:
             order.status = 'Delivered'
             order.save()
-            # Rider wallet logic goes here!
+            if signature:
+                signature.rider_confirmed = True
+                signature.save(update_fields=['rider_confirmed'])
             return redirect('logistics:rider_dashboard')
         else:
             # Handle wrong PIN (in real app, use messages framework)
